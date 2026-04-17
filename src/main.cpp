@@ -5,7 +5,6 @@
 using namespace geode::prelude;
 
 std::string getQualitySuffix(int miQuality) {
-
 	switch(miQuality) {
 		case 1:
 			return "";
@@ -18,12 +17,27 @@ std::string getQualitySuffix(int miQuality) {
 	}
 }
 
+std::string getSubfolderName(IconType type) {
+	switch(type) {
+		case IconType::Cube:
+			return "icon";
+		default:
+			return "i am unfinished";
+	}
+}
+
 class $modify(StealerGarageLayer, GJGarageLayer) {
+	static void onModify(auto& self) {
+		if (!self.setHookPriorityPost("GJGarageLayer::init", Priority::Last)) {
+			log::warn("Failed to set hook priority.");
+		}
+	}
+
 	bool init() {
 		if (!GJGarageLayer::init()) return false;
 
 		auto winSize = CCDirector::sharedDirector()->getWinSize();
-		auto btnSpr = CircleButtonSprite::create(CCSprite::create("stealIcon.png"_spr), CircleBaseColor::Red, CircleBaseSize::MediumAlt);
+		auto btnSpr = CircleButtonSprite::createWithSprite("stealIcon.png"_spr, 0.85f, CircleBaseColor::Red, CircleBaseSize::MediumAlt);
 		auto btn = CCMenuItemSpriteExtra::create(btnSpr, this, menu_selector(StealerGarageLayer::stealIcon));
 		auto menu = CCMenu::create();
 
@@ -33,8 +47,8 @@ class $modify(StealerGarageLayer, GJGarageLayer) {
 
 		btn->setPosition({menu->getContentSize().width / 2.f, menu->getContentSize().height / 2.f});
 
-		menu->setPosition({10.f, 40.f});
-		menu->setScale(0.8f);
+		menu->setPosition({winSize.width - 50.f, winSize.height / 2.f - 40.f});
+		menu->setScale(0.7f);
 
 		this->addChild(menu);
 
@@ -53,6 +67,15 @@ class $modify(StealerGarageLayer, GJGarageLayer) {
 			return;
 		}
 
+		if (!Mod::get()->setSavedValue("shown-first-warning", true)) {
+			FLAlertLayer::create(
+				"WARNING!",
+				"In case you haven't, PLEASE visit the mod's settings and set your Icon destination folder! Otherwise the mod can crash or save your icons god knows where.",
+				"OK"
+			)->show();
+			return;
+		}
+
 		std::string iconName = icon->getShortName();
 		std::string plistFileName = icon->getShortName() + getQualitySuffix(icon->getQuality()) + ".plist";
 		std::string sheetFileName = icon->getShortName() + getQualitySuffix(icon->getQuality()) + ".png";
@@ -66,10 +89,18 @@ class $modify(StealerGarageLayer, GJGarageLayer) {
 		std::filesystem::path newPlistPath = targetPathString + plistFileName;
 		std::filesystem::path newSheetPath = targetPathString + sheetFileName;
 
+		if (!std::filesystem::is_directory(Mod::get()->getSettingValue<std::filesystem::path>("destination-folder"))) {
+			FLAlertLayer::create(
+				"Folder Not Found!",
+				"The folder you're trying to save icons to doesn't exist, are you sure you set it up correctly in mod settings? (Default folder is only created when you open the mod's config directory, btw...)",
+				"OK"
+			)->show();
+			return;
+		}
+
 		std::filesystem::copy(plistPath, newPlistPath, std::filesystem::copy_options::update_existing);
 		std::filesystem::copy(sheetPath, newSheetPath, std::filesystem::copy_options::update_existing);
 
-		auto sigh = CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png");
-		Notification::create("Icon stolen!", sigh, 0.3f)->show();
+		Notification::create("Icon stolen!", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"), 0.3f)->show();
 	}
 };
