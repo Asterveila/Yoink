@@ -21,8 +21,24 @@ std::string getSubfolderName(IconType type) {
 	switch(type) {
 		case IconType::Cube:
 			return "icon";
+		case IconType::Ship:
+			return "ship";
+		case IconType::Ball:
+			return "ball";
+		case IconType::Ufo:
+			return "ufo";
+		case IconType::Wave:
+			return "wave";
+		case IconType::Robot:
+			return "robot";
+		case IconType::Spider:
+			return "spider";
+		case IconType::Swing:
+			return "swing";
+		case IconType::Jetpack:
+			return "jetpack";
 		default:
-			return "i am unfinished";
+			return "unknown";
 	}
 }
 
@@ -47,7 +63,7 @@ class $modify(StealerGarageLayer, GJGarageLayer) {
 
 		btn->setPosition({menu->getContentSize().width / 2.f, menu->getContentSize().height / 2.f});
 
-		menu->setPosition({winSize.width - 50.f, winSize.height / 2.f - 40.f});
+		menu->setPosition({winSize.width - 50.f, winSize.height / 2.f - 60.f});
 		menu->setScale(0.7f);
 
 		this->addChild(menu);
@@ -56,7 +72,8 @@ class $modify(StealerGarageLayer, GJGarageLayer) {
 	}
 
 	void stealIcon(CCObject* sender) {
-		IconInfo* icon = more_icons::activeIcon(GameManager::sharedState()->m_playerIconType);
+		IconType stealType = GameManager::sharedState()->m_playerIconType;
+		IconInfo* icon = more_icons::activeIcon(stealType);
 
 		if (icon->isVanilla() || icon->isZipped()) {
 			FLAlertLayer::create(
@@ -77,15 +94,17 @@ class $modify(StealerGarageLayer, GJGarageLayer) {
 		}
 
 		std::string iconName = icon->getShortName();
+		std::string typeName = getSubfolderName(stealType);
 		std::string plistFileName = icon->getShortName() + getQualitySuffix(icon->getQuality()) + ".plist";
 		std::string sheetFileName = icon->getShortName() + getQualitySuffix(icon->getQuality()) + ".png";
 
 		std::string iconFolder = utils::string::trimRight(icon->getSheetString(), plistFileName); 
-		std::string targetPathString = utils::string::pathToString(Mod::get()->getSettingValue<std::filesystem::path>("destination-folder")) + "\\";
+		std::string targetPathString = utils::string::pathToString(Mod::get()->getSettingValue<std::filesystem::path>("destination-folder")) + "\\" + typeName + "\\";
 
 		std::filesystem::path plistPath = icon->getSheet();
 		std::filesystem::path sheetPath = iconFolder + sheetFileName;
 
+		std::filesystem::path trueTargetFolder = targetPathString;
 		std::filesystem::path newPlistPath = targetPathString + plistFileName;
 		std::filesystem::path newSheetPath = targetPathString + sheetFileName;
 
@@ -97,6 +116,8 @@ class $modify(StealerGarageLayer, GJGarageLayer) {
 			)->show();
 			return;
 		}
+
+		std::filesystem::create_directory(trueTargetFolder);
 
 		std::filesystem::copy(plistPath, newPlistPath, std::filesystem::copy_options::update_existing);
 		std::filesystem::copy(sheetPath, newSheetPath, std::filesystem::copy_options::update_existing);
