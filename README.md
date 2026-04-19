@@ -1,23 +1,12 @@
-# Yoink
-This is where she makes a mod.
+# Yoink!
+<img src="logo.png" width="150" alt="the mod's logo"/>
 
-<img src="logo.png" width="150" alt="the mod's logo" />
+Yoink is a very simple mod made specifically for Geometry Dash ***Mix Texture Pack*** makers. This mod allows you to essentially extract icons from other texture packs, and put them in a specific folder of your choice (defined in mod settings), even organizing them in their proper MoreIcons format folder!
 
-*Update logo.png to change your mod's icon (please)*
+## How to?
+The mod is very simple to use, basically:
 
-## Getting started
-We recommend heading over to [the getting started section on our docs](https://docs.geode-sdk.org/getting-started/) for useful info on what to do next.
-
-## Build instructions
-For more info, see [our docs](https://docs.geode-sdk.org/getting-started/create-mod#build)
-```sh
-# Assuming you have the Geode CLI set up already
-geode build
-```
-
-# Resources
-* [Geode SDK Documentation](https://docs.geode-sdk.org/)
-* [Geode SDK Source Code](https://github.com/geode-sdk/geode/)
-* [Geode CLI](https://github.com/geode-sdk/cli)
-* [Bindings](https://github.com/geode-sdk/bindings/)
-* [Dev Tools](https://github.com/geode-sdk/DevTools)
+- Head over to the mod's settings to set a destination folder.
+- Open the Icon Kit and select any icon.
+- Click on the red "Steal" button located at the right of the screen.
+- Done! Icon files from your selected icon are now in your chosen folder for your ease of use!
